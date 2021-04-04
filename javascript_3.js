@@ -18,6 +18,7 @@ xxxx
 xxxxx
 */
 
+<<<<<<< Updated upstream
 // 1.
 
 // let i = 0;
@@ -42,6 +43,34 @@ xxxxx
 // }
 
 // console.log('Товаров в корзине на сумму: ' + countBasketPrice(basket))
+=======
+// 1. Упустил, что простые нужны числа. Переделал
+
+function primeNum(num) {
+    if (num < 2) {
+        return false;
+    }
+    for (let i = 2; i <= num / 2; i++) {
+        if (num % i === 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+let i = 0;
+
+while (i < 100) {
+    if (primeNum(i)) {
+        console.log(i);
+    }
+    i++;
+}
+
+// // 2. 
+
+// Вариант 1 - убираем значит
+>>>>>>> Stashed changes
 
 // // Вариант 2
 // const itemCard1 = ['мяч', 30];
