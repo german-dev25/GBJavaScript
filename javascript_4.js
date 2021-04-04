@@ -158,40 +158,16 @@ class Product {
     }
 }
 
-const id_000_001 = new Product(000001,
-    'Мяч',
-    'Мяч неквадратный для игры в настольный теннис',
-    ['зеленый', 'синий', 'красный'],
-    ['id000001_1.jpg', 'id000001_2.jpg', 'id000001_3.jpg',],
-    450,
-    4.5,
-    0.1)
-
-const id_000_002 = new Product(000002,
-    'Обувь',
-    'Спортивная обувь с ортопедической стелькой',
-    ['черный', 'белый'],
-    ['id000002_1.jpg', 'id000002_2.jpg', 'id000003_3.jpg', 'id000004_3.jpg',],
-    6000,
-    4.8,
-    0.0)
-
-const id_000_003 = new Product(000003,
-    'Футболка',
-    'Футболка для пробежек и прогулок',
-    ['оранжево-зеленая', 'сине-красная', 'бело-черная'],
-    ['id000003_1.jpg', 'id000003_2.jpg', 'id000003_3.jpg', 'id000003_3.jpg',],
-    3500,
-    3.8,
-    0.2)
-
 /**
  * Купоны **
  * couponType - вид скидки (на "рублевый номинал" или "процент")
  * couponDiscount - сумма или % скидки
  * couponDate - срок "жизни" купона (дней)
  * couponStart - дата начала действия
+ * userInputCode - ввод пользователем кода
+ * 
  * getCouponInfo - информация о купоне
+ * couponActivate - если пользователь ввел код - активация купонов
  * 
  * нереализованные методы (с Date не разобрался): 
     getCouponDateStart - дата начала действия купона (праздничные и др. события, а также ДР пользователя)
@@ -227,16 +203,20 @@ class Coupon {
         }
     }
 
+    getCountDown() {
+        // dateOfTheEnd
+    }
+
     couponActivate() {
         return (this.userInputCode == this.secretCode) ? 0 : -1
     }
 }
 
-const blackFridayCoupon2021 = new Coupon('Черная пятница', 'percent', 0.1, 14, 'BF2021', '');
-const happyBirthDay = new Coupon('С Днем Рождения', 'amount', 500, 30, 'HappyBirthday2021', 'HappyBirthday2021');
-
 /**
  * Доставка
+ * 
+ * getFullDeliveryInfo - полная информация по доставке
+ * getDeliveryDate - нереализованный, сложность с Date
  */
 
 class Delivery {
@@ -255,6 +235,35 @@ class Delivery {
     }
 }
 
+// несколько товаров
+
+const id_000_001 = new Product(000001,
+    'Мяч',
+    'Мяч неквадратный для игры в настольный теннис',
+    ['зеленый', 'синий', 'красный'],
+    ['id000001_1.jpg', 'id000001_2.jpg', 'id000001_3.jpg',],
+    450,
+    4.5,
+    0.1)
+
+const id_000_002 = new Product(000002,
+    'Обувь',
+    'Спортивная обувь с ортопедической стелькой',
+    ['черный', 'белый'],
+    ['id000002_1.jpg', 'id000002_2.jpg', 'id000003_3.jpg', 'id000004_3.jpg',],
+    6000,
+    4.8,
+    0.0)
+
+const id_000_003 = new Product(000003,
+    'Футболка',
+    'Футболка для пробежек и прогулок',
+    ['оранжево-зеленая', 'сине-красная', 'бело-черная'],
+    ['id000003_1.jpg', 'id000003_2.jpg', 'id000003_3.jpg', 'id000003_3.jpg',],
+    3500,
+    3.8,
+    0.2)
+
 // инициализурем службы доставки
 
 const neYa = new Delivery('НеЯ.Плейс', 350, 5);
@@ -262,10 +271,17 @@ const nitrogen = new Delivery('Азот', 500, 3);
 const homeberry = new Delivery('Клюква', 200, 5);
 const pickUp = new Delivery('Самовывоз', 0, 3);
 
+// пара купонов
+
+const blackFridayCoupon2021 = new Coupon('Черная пятница', 'percent', 0.1, 14, 'BF2021', '');
+const happyBirthDay = new Coupon('С Днем Рождения', 'amount', 500, 30, 'HappyBirthday2021', 'HappyBirthday2021');
+
 // тестовый заказ и пользователь
 
 const testOrder = new Order(0001, [id_000_001, id_000_002, id_000_002, id_000_003], neYa);
 const testUser = new Users(00001, 'Москва', '1989-03-25', testOrder, [blackFridayCoupon2021, happyBirthDay])
+
+// одна корзина одного пользователя для одного заказа
 
 const basket = {
     products: testOrder.shopList,
@@ -280,7 +296,7 @@ const basket = {
         return basketPrice;
     },
 
-    discount() {
+    discountInBasket() {
         let discount = 0;
         for (let i = 0; i < this.products.length; i++) {
             discount += this.products[i].productPrice * this.products[i].discount;
@@ -288,7 +304,7 @@ const basket = {
         return -discount;
     },
 
-    coupon() {
+    couponInBasket() {
         let amountOfCoupon = 0;
         for (let i = 0; i < this.coupons.length; i++) {
             if (this.coupons[i].status()) {
@@ -303,14 +319,14 @@ const basket = {
     },
 
     countBasketPrice() {
-        return this.basketFullPrice() + this.discount() + this.coupon();
+        return this.basketFullPrice() + this.discountInBasket() + this.couponInBasket();
     },
 
 }
 
 console.log(`Общая сумма в корзине: ${basket.basketFullPrice()}`);
-console.log(`Сумма скидок: ${basket.discount()}`);
-console.log(`Сумма купонов: ${basket.coupon()}`);
+console.log(`Сумма скидок: ${basket.discountInBasket()}`);
+console.log(`Сумма купонов: ${basket.couponInBasket()}`);
 console.log(`Сумма с учетом скидок: ${basket.countBasketPrice()}`);
 console.log(`Информация о доставке\n${basket.delivery.getFullDeliveryInfo()}`);
 console.log(`Сумма с учетом скидок и доставки: ${basket.countBasketPrice() + basket.delivery.deliveryPrice}`);
